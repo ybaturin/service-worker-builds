@@ -1852,7 +1852,7 @@ class Driver {
           .then((clientList) => {
             for (let i = 0; i < clientList.length; i++) {
               const client = clientList[i];
-              if (client.url == '/purchases' && 'focus' in client)
+              if (client.focus)
                 return client.focus();
             }
             if (this.scope.clients.openWindow) {
