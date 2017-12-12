@@ -8,6 +8,57 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+
+class PushMessageFormatter {
+    format(notification) {
+        const type = notification.data && notification.data.type ? notification.data.type : null;
+        if (!type) {
+            return notification;
+        }
+
+        let message = {};
+        switch(type) {
+            case 'purchases':
+                message = this._getPurchaseMessage(notification);
+                break;
+        }
+
+        return {
+            ...notification,
+            ...message
+        };
+    }
+
+    _getPurchaseMessage(notification) {
+        const purchases = notification.data.purchases;
+        const titleArr = [];
+        const positivePurchases = purchases.filter(purchase => purchase.price > 0);
+        const negativePurchases = purchases.filter(purchase => purchase.price < 0);
+        const positiveAmount = positivePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
+        const negativeAmount = negativePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
+        if (positiveAmount) {
+          titleArr.push(`+${negativeAmount} руб.`)
+        }
+        if (negativeAmount) {
+          titleArr.push(negativeAmount);
+        }
+        const bodyArr = [];
+        positivePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
+        negativePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
+
+        return {
+            body: bodyArr.join('\n'),
+            title: titleArr.join('/') + ' руб.',
+        };
+    }
+
+    _getPurchaseRow(purchase) {
+        const name = purchase.name.slice(0, 15) + '...';
+        const sign = purchase.price > 0 ? '+' : '';
+        return `${name}   -   ${sign}${purchase.price} ₽`;
+    }
+}
+
 /**
  * Adapts the service worker to its runtime environment.
  *
@@ -1879,11 +1930,9 @@ class Driver {
         if (!data.notification || !data.notification.title) {
             return;
         }
-        const desc = data.notification;
-        let options = {};
-        NOTIFICATION_OPTION_NAMES.filter(name => desc.hasOwnProperty(name))
-            .forEach(name => options[name] = desc[name]);
-        this.scope.registration.showNotification(desc['title'], options);
+        const formatter = new PushMessageFormatter();
+        const notification = formatter.format(data.notification);
+        this.scope.registration.showNotification(notification.title, notification);
     }
     async reportStatus(client, promise, nonce) {
         const response = { type: 'STATUS', nonce, status: true };
