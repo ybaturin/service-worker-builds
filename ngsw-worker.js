@@ -1673,7 +1673,7 @@ const IDLE_THRESHOLD = 5000;
 const SUPPORTED_CONFIG_VERSION = 1;
 const NOTIFICATION_OPTION_NAMES = [
     'actions', 'body', 'dir', 'icon', 'lang', 'renotify', 'requireInteraction', 'tag', 'vibrate',
-    'data'
+    'data', 'badge'
 ];
 var DriverReadyState;
 (function (DriverReadyState) {
@@ -1754,6 +1754,10 @@ class Driver {
         this.scope.addEventListener('fetch', (event) => this.onFetch(event));
         this.scope.addEventListener('message', (event) => this.onMessage(event));
         this.scope.addEventListener('push', (event) => this.onPush(event));
+        // >> added
+        this.scope.addEventListener('push', (event) => this.onNotificationclick(event));
+        // << added
+
         // The debugger generates debug pages in response to debugging requests.
         this.debugger = new DebugHandler(this, this.adapter);
         // The IdleScheduler will execute idle tasks after a given delay.
@@ -1832,6 +1836,32 @@ class Driver {
         // Handle the push and keep the SW alive until it's handled.
         msg.waitUntil(this.handlePush(msg.data.json()));
     }
+    // >> added
+    onNotificationclick(event) {
+      console.log('On notification click: ', event.notification.tag);
+      // Android doesn't close the notification when you click on it
+      // See: http://crbug.com/463146
+      event.notification.close();
+
+      // This looks to see if the current is already open and
+      // focuses if it is
+      event.waitUntil(
+        this.scope.clients.matchAll({
+          type: "window"
+        })
+          .then((clientList) => {
+            for (let i = 0; i < clientList.length; i++) {
+              const client = clientList[i];
+              if (client.url == '/purchases' && 'focus' in client)
+                return client.focus();
+            }
+            if (this.scope.clients.openWindow) {
+              return this.scope.clients.openWindow('/purchases');
+            }
+          })
+      );
+    }
+    // << added
     async handleMessage(msg, from) {
         if (isMsgCheckForUpdates(msg)) {
             const action = (async () => { await this.checkForUpdate(); })();
