@@ -21,5 +21,6 @@
   },
   "bin": {
     "ngsw-config": "./ngsw-config.js"
-  }
+  },
+  "devDependencies": {}
 }

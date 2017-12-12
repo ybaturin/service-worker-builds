@@ -1755,7 +1755,7 @@ class Driver {
         this.scope.addEventListener('message', (event) => this.onMessage(event));
         this.scope.addEventListener('push', (event) => this.onPush(event));
         // >> added
-        this.scope.addEventListener('push', (event) => this.onNotificationclick(event));
+        this.scope.addEventListener('notificationclick', (event) => this.onNotificationclick(event));
         // << added
 
         // The debugger generates debug pages in response to debugging requests.
