@@ -32,15 +32,15 @@ class PushMessageFormatter {
     _getPurchaseMessage(notification) {
         const purchases = notification.data.purchases;
         const titleArr = [];
-        const positivePurchases = purchases.filter(purchase => purchase.price > 0);
-        const negativePurchases = purchases.filter(purchase => purchase.price < 0);
+        const positivePurchases = purchases.filter(purchase => purchase.price > 0).sort(this._sortPurchases);
+        const negativePurchases = purchases.filter(purchase => purchase.price < 0).sort(this._sortPurchases);
         const positiveAmount = positivePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
         const negativeAmount = negativePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
         if (positiveAmount) {
-          titleArr.push(`+${negativeAmount} руб.`)
+          titleArr.push(`+${negativeAmount}₽`)
         }
         if (negativeAmount) {
-          titleArr.push(negativeAmount);
+          titleArr.push(`${negativeAmount}₽`);
         }
         const bodyArr = [];
         positivePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
@@ -48,14 +48,19 @@ class PushMessageFormatter {
 
         return {
             body: bodyArr.join('\n'),
-            title: titleArr.join('/') + ' руб.',
+            title: titleArr.join(' / '),
         };
     }
 
     _getPurchaseRow(purchase) {
-        const name = purchase.name.slice(0, 15) + '...';
-        const sign = purchase.price > 0 ? '+' : '';
-        return `${name}   -   ${sign}${purchase.price} ₽`;
+        const pName = purchase.name;
+        const name = pName.length > 25 ? pName.slice(0, 12) + '...' : pName;
+        const sign = purchase.price > 0 ? '+' : '-';
+        return `${sign}${Math.abs(purchase.price)}₽\u2001${name}`;
+    }
+
+    _sortPurchases(p1, p2) {
+        return Math.abs(p1.price) - Math.abs(p2.price);
     }
 }
 
