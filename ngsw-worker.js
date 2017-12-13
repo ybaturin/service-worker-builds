@@ -1920,11 +1920,11 @@ class Driver {
           type: "window"
         })
           .then((clientList) => {
-            for (let i = 0; i < clientList.length; i++) {
-              const client = clientList[i];
-              if (client.focus)
-                return client.focus();
-            }
+            // for (let i = 0; i < clientList.length; i++) {
+            //   const client = clientList[i];
+            //   if (client.focus)
+            //     return client.focus();
+            // }
             if (this.scope.clients.openWindow) {
               return this.scope.clients.openWindow('/purchases');
             }
