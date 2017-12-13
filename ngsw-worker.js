@@ -57,9 +57,20 @@ class PushMessageFormatter {
 
     _getPurchaseRow(purchase) {
         const pName = purchase.name;
-        const name = pName.length > 25 ? pName.slice(0, 12) + '...' : pName;
-        const sign = purchase.price > 0 ? '+' : '-';
-        return `${sign}${Math.abs(purchase.price)} ${name}`;
+        const name = pName.length > 20 ? pName.slice(0, 17) + '...' : pName;
+        const sign = purchase.price > 0 ? '+' : '';
+        const today = this._formatDate(new Date());
+        const purchaseDate = this._formatDate(new Date(purchase.date));
+
+        let dateStr = '';
+        if (today !== purchaseDate) {
+            dateStr = ` (${purchaseDate})`;
+        }
+        return `${sign}${purchase.price} ${name}${dateStr}`;
+    }
+
+    _formatDate(date) {
+        return `${date.getDate()}.${date.getMonth()+1}.${date.getFullYear()}`;
     }
 
     _sortPurchases(p1, p2) {
