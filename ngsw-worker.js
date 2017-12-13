@@ -37,18 +37,21 @@ class PushMessageFormatter {
         const positiveAmount = positivePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
         const negativeAmount = negativePurchases.reduce((sum, purchase) => sum + purchase.price, 0);
         if (positiveAmount) {
-          titleArr.push(`+${negativeAmount}₽`)
+          titleArr.push(`+${positiveAmount}`)
         }
         if (negativeAmount) {
-          titleArr.push(`${negativeAmount}₽`);
+          titleArr.push(negativeAmount);
         }
         const bodyArr = [];
         positivePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
+        if (positivePurchases.length > 0) {
+            bodyArr.push('\n');
+        }
         negativePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
 
         return {
             body: bodyArr.join('\n'),
-            title: titleArr.join(' / '),
+            title: titleArr.join(' | '),
         };
     }
 
@@ -56,7 +59,7 @@ class PushMessageFormatter {
         const pName = purchase.name;
         const name = pName.length > 25 ? pName.slice(0, 12) + '...' : pName;
         const sign = purchase.price > 0 ? '+' : '-';
-        return `${sign}${Math.abs(purchase.price)}₽\u2001${name}`;
+        return `${sign}${Math.abs(purchase.price)} ${name}`;
     }
 
     _sortPurchases(p1, p2) {
