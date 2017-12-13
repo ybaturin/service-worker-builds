@@ -19,7 +19,7 @@ class PushMessageFormatter {
         let message = {};
         switch(type) {
             case 'purchases':
-                message = this._getPurchaseMessage(notification);
+                message = this._getPurchaseMessage(notification);``
                 break;
         }
 
@@ -1951,7 +1951,7 @@ class Driver {
         }
         const formatter = new PushMessageFormatter();
         const notification = formatter.format(data.notification);
-        this.scope.registration.showNotification(notification.title, notification);
+        await this.scope.registration.showNotification(notification.title, notification);
     }
     async reportStatus(client, promise, nonce) {
         const response = { type: 'STATUS', nonce, status: true };
