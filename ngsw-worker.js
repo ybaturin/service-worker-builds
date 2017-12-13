@@ -60,7 +60,7 @@ class PushMessageFormatter {
     }
 
     _sortPurchases(p1, p2) {
-        return Math.abs(p1.price) - Math.abs(p2.price);
+        return Math.abs(p2.price) - Math.abs(p1.price);
     }
 }
 
