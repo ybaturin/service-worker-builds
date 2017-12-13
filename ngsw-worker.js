@@ -45,7 +45,7 @@ class PushMessageFormatter {
         const bodyArr = [];
         positivePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
         if (positivePurchases.length > 0) {
-            bodyArr.push('\n');
+            bodyArr.push('');
         }
         negativePurchases.forEach(purchase => bodyArr.push(this._getPurchaseRow(purchase)));
 
